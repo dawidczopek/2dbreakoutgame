@@ -29,11 +29,14 @@
         var ballColor = '#0095DD';
         //Paddle variable
         var paddleHeight = 10;
-        var paddleWidth = 75;
+        var paddleWidth = 400;
+        var paddleWidthMin = 100;
         var paddleX = (canvas.width-paddleWidth) / 2;
         //Move variable
         var rightPressed = false;
         var leftPressed = false;
+        var framesPerSecond = 100;
+        var timeFromStart = new Date().getTime() / 1000;
 
         document.addEventListener("keydown", keyDownHandler, false);
         document.addEventListener("keyup", keyUpHandler, false);
@@ -60,29 +63,48 @@
             }
             return color;
         }
+
         function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBall();
-            drawPaddle();
+            setTimeout(function() {
+                requestAnimationFrame(draw);
+                var timeWork = new Date().getTime() / 1000;
 
-            if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
-                dx = -dx;
-                ballColor = getRandomColor();
-            }
+                if(timeWork > (timeFromStart+20) && paddleWidth > paddleWidthMin){
 
-            if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {
-                dy = -dy;
-                ballColor = getRandomColor();
-            }
-            x += dx;
-            y += dy;
+                    for(var i = 0; i < 2; i++){
+                        (function (i) {
+                            setTimeout(function () {
+                                paddleWidth -= 1;
+                            }, 1000*i);
+                            console.log(i);
+                        })(i);
+                    };
 
-            if(rightPressed && paddleX < canvas.width - paddleWidth){
-                paddleX += 7;
-            }else if(leftPressed && paddleX > 0){
-                paddleX -= 7;
-            }
 
+                    timeFromStart += 10;
+                }
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawBall();
+                drawPaddle();
+
+                if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+                    dx = -dx;
+                    ballColor = getRandomColor();
+                }
+
+                if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {
+                    dy = -dy;
+                    ballColor = getRandomColor();
+                }
+                x += dx;
+                y += dy;
+
+                if(rightPressed && paddleX < canvas.width - paddleWidth){
+                    paddleX += 7;
+                }else if(leftPressed && paddleX > 0){
+                    paddleX -= 7;
+                }
+            }, 1000 / framesPerSecond);
         }
         function keyDownHandler(e){
             if(e.key == 'Right' || e.key == 'ArrowRight'){
@@ -99,7 +121,7 @@
             }
         }
 
-        setInterval(draw, 10);
+        draw();
     </script>
 </body>
 </html>
