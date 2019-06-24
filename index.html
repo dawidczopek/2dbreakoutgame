@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Game 2D with pure javascript!</title>
+    <title>Hit the Ball!</title>
     <style>
         * {
             padding: 0;
@@ -35,8 +35,40 @@
         //Move variable
         var rightPressed = false;
         var leftPressed = false;
-        var framesPerSecond = 100;
+        var framesPerSecond = 40;
         var timeFromStart = new Date().getTime() / 1000;
+
+        //Bricks
+        var brickRowCount = 3;
+        var brickColumntCount = 5;
+        var brickWidth = 75;
+        var brickHeight = 20;
+        var brickPadding = 10;
+        var brickOffsetTop = 30;
+        var brickOffsetLeft = 30;
+
+        var bricks = [];
+
+        for(var c = 0; c < brickColumntCount; c++){
+            bricks[c] = [];
+            for(var r = 0; r < brickRowCount; r++){
+                bricks[c][r] = {x: 0, y: 0};
+            }
+        }
+
+        function drawBricks(){
+            for(var c=0; c<brickColumntCount; c++){
+                for(var r=0; r<brickRowCount; r++){
+                    bricks[c][r].x = 0;
+                    bricks[c][r].y = 0;
+                    ctx.beginPath();
+                    ctx.rect(0, 0, brickWidth, brickHeight);
+                    ctx.fillStyle = "#0095DD";
+                    ctx.fill();
+                    ctx.closePath();
+                }
+            }
+        }
 
         document.addEventListener("keydown", keyDownHandler, false);
         document.addEventListener("keyup", keyUpHandler, false);
@@ -70,7 +102,6 @@
                 var timeWork = new Date().getTime() / 1000;
 
                 if(timeWork > (timeFromStart+20) && paddleWidth > paddleWidthMin){
-
                     for(var i = 0; i < 2; i++){
                         (function (i) {
                             setTimeout(function () {
@@ -79,23 +110,31 @@
                             console.log(i);
                         })(i);
                     };
-
-
                     timeFromStart += 10;
                 }
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 drawBall();
                 drawPaddle();
+                drawBricks();
 
                 if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
                     dx = -dx;
                     ballColor = getRandomColor();
                 }
 
-                if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {
+                if(y + dy < ballRadius) {
                     dy = -dy;
-                    ballColor = getRandomColor();
+                } else if(y + dy > canvas.height-ballRadius) {
+                    if(x > paddleX && x < paddleX + paddleWidth){
+                       dy = -dy;
+                       framesPerSecond += 5 ;
+                    }else{
+                        alert("GAME OVER");
+                        document.location.reload();
+                        clearInterval(interval);
+                    }
                 }
+
                 x += dx;
                 y += dy;
 
@@ -121,7 +160,8 @@
             }
         }
 
-        draw();
+        var interval = draw();
+        interval;
     </script>
 </body>
 </html>
