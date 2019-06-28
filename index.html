@@ -61,7 +61,14 @@
         }
 
         var score = 0;
+        var ifWinner = 0;
+        var lives = 3;
 
+        function drawLives() {
+            ctx.font = '16px Arial';
+            ctx.fillStyle = "#0095DD";
+            ctx.fillText('Lives: '+lives, canvas.width - 65, 20);
+        }
         function drawScore() {
             ctx.font = '16px Arial';
             ctx.fillStyle = '#0095DD';
@@ -75,9 +82,8 @@
         function mouseMoveHandler(e){
             var relativeX = e.clientX - canvas.offsetLeft;
             if(relativeX > 0 && relativeX < canvas.width)
-                (relativeX < paddleWidth/2) ? paddleX = relativeX : paddleX = relativeX-paddleWidth;
-
-                console.log(relativeX);
+                (relativeX - (paddleWidth/2) == 0 || relativeX - (paddleWidth/2) < 0) ? paddleX = 0 : "N/A";
+                (relativeX + (paddleWidth/2) == canvas.width || relativeX + (paddleWidth/2) > canvas.width) ? paddleX = canvas.width - paddleWidth : "N/A";
         }
 
         function keyDownHandler(e) {
@@ -120,7 +126,8 @@
                             b.status = 0;
                             ballColor = getRandomColor();
                             score++;
-                            if(score == brickRowCount*brickColumnCount){
+                            ifWinner++;
+                            if(ifWinner == brickRowCount*brickColumnCount){
                                 alert('You are WINNER!!!You number score is '+score);
                                 document.location.reload();
                                 clearInterval(interval);
@@ -185,6 +192,7 @@
                 drawBall();
                 drawPaddle();
                 drawScore();
+                drawLives();
                 collisionDetection();
                 if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
                     dx = -dx;
@@ -197,10 +205,20 @@
                         dy = -dy;
                         framesPerSecond += 5;
                         couplePoints = 0;
-                    }else{
-                        alert("GAME OVER");
-                        document.location.reload();
-                        clearInterval(interval);
+                    } else {
+                        lives--;
+                        if (!lives) {
+                            console.log("GAME OVER");
+                            document.location.reload();
+                            clearInterval(interval);
+                        } else {
+                            alert('You still have '+lives+' lives. Let`s go!!!');
+                            x = canvas.width/2;
+                            y = canvas.height-30;
+                            dx = 2;
+                            dy = -2;
+                            paddleX = (canvas.width-paddleWidth) / 2;
+                        }
                     }
                 }
 
